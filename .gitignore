@@ -2,3 +2,5 @@
 .vscode/*
 __pycache__/*
 env/*
+utils/__pycache__/*
+src/pages/__pycache__/*
