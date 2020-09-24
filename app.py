@@ -1,12 +1,26 @@
-from flask import Flask, render_template, request, url_for, flash, redirect
-import pandas as pd
+import streamlit as st
+import utils.display as udisp
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'er32gE1df3R2gs1T23sd1Pg23fW3dgh32N13h13klD31j3sd'
+import src.pages.home
+import src.pages.about
 
-data = pd.DataFrame( pd.read_csv('results.csv') )
+MENU = {
+    "Home" : src.pages.home,
+    "Sobre" : src.pages.about
+}
 
+def main():
+    st.sidebar.title("Menu")
+    menu_selection = st.sidebar.radio("Escolha entre as aplicações:", list(MENU.keys()))
 
-@app.route('/')
-def index():
-    return render_template('template/index.html', data=data)
+    menu = MENU[menu_selection]
+
+    with st.spinner(f"Carregando {menu_selection} ..."):
+        udisp.render_page(menu)
+
+    # st.sidebar.info(
+    #     "https://github.com/Luyyss/iron_man_2019_stats"
+    # )
+
+if __name__ == "__main__":
+    main()
