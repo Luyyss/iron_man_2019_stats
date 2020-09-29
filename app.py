@@ -5,9 +5,13 @@ import resources.translate as translate
 
 import src.pages.home
 import src.pages.about
+import src.pages.coutryes
 
 MENU = {
     "Top 10" : src.pages.home,
+    "Estatísticas dos países" : src.pages.coutryes,
+    "Estatísticas por modalidade" : src.pages.coutryes,
+    "Estatísticas por atleta" : src.pages.coutryes,
     "Sobre" : src.pages.about
 }
 
