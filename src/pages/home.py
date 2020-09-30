@@ -29,14 +29,13 @@ def prep_df(data, name, ord):
 
 def createPlot(df):
     return alt.Chart( df ).mark_bar().encode(
-        x=alt.X('Segundos:Q'), #, axis=alt.Axis(grid=False, title=None)
+        x=alt.X('Segundos:Q', axis=alt.Axis(title=None)), # , format=("%H:%M:%S")  , timeUnit='hoursminutesseconds' 
         y=alt.Y('Name:N', axis=alt.Axis(grid=False, title=None)),
-        column=alt.Column('c2:N', title=None),
+        # column=alt.Column('c2:N', title=None),
         color=alt.Color('Classe:N', sort=['SwimN', 'T1N', 'BikeN', 'T2N', 'RunN'], scale=alt.Scale(range=['#96ceb4', '#BF820E','#4BA55E', '#4FA7A5', '#CBBE00'])),
         tooltip=['Tempo:N'],
         order=alt.Order(
             'Order',
-            # sort='ascending'
             sort='descending'
         )
     ).configure_view(
