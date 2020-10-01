@@ -12,7 +12,7 @@ def write():
 
     categorias = funcs.getCategories(data)
 
-    option = st.selectbox( "Selecione a categoria", sorted(categorias))
+    option = st.sidebar.selectbox( "Selecione a categoria", sorted(categorias))
 
     atletas_m = data.loc[data['Division'] == f'M{option}']
     atletas_f = data.loc[data['Division'] == f'F{option}']

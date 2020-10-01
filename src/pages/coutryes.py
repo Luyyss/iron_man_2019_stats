@@ -5,6 +5,7 @@ import altair as alt
 import streamlit as st
 import utils.display as udisp
 import utils.functions as funcs
+from src.classes.Grid import Grid
 
 def write():
 
@@ -31,10 +32,10 @@ def write():
     udisp.title_awesome("Quantidade de atletas por país")
 
     bars = alt.Chart(df).mark_bar().encode(
-        alt.X('Atletas', type='quantitative', title='Quantidade de atletas'),
-        alt.Y('name', type='nominal', title='País'),
+        alt.Y('Atletas', type='quantitative', title='Quantidade de atletas'),
+        alt.X('name', type='nominal', title='País'),
         tooltip=['Atletas']
-    ).properties(height=900, width=700)
+    ).properties(height=450) #, width=700
 
     text = bars.mark_text(
         align='left',
@@ -53,17 +54,47 @@ def write():
     ## 
     ##
 
+    udisp.title_awesome("Top atletas por país")
+
     categorias = funcs.getCategories(data)
 
-    option = st.selectbox( "Selecione a categoria", sorted(categorias) )
+    option = st.sidebar.selectbox( "Selecione a categoria", sorted(categorias) )
 
     atletas_m = data.loc[data['Division'] == f'M{option}']
     atletas_f = data.loc[data['Division'] == f'F{option}']
 
-    st.dataframe(atletas_m.head(10))
+    # st.dataframe(atletas_m.head(10))
 
+    q = st.sidebar.selectbox( "Quantidade de atletas", [5,10, 15,20] )
 
-    q = st.selectbox( "Quantidade de atletas", [5,10, 15,20] )
+    division_sum_m = atletas_m.head( int(q) ).groupby(['Country', 'Country Name']).agg({"Atletas": np.sum})
+    # st.dataframe(division_sum_m)
 
-    division_sum = atletas_m.head( int(q) ).groupby(['Country', 'Country Name']).agg({"Atletas": np.sum})
-    st.dataframe(division_sum)
+    division_sum_f = atletas_f.head( int(q) ).groupby(['Country', 'Country Name']).agg({"Atletas": np.sum})
+    # st.dataframe(division_sum_f)
+    
+
+    with Grid("1 1 1", color="#000000", background_color="#FFFFFF") as grid:
+        # grid.cell(
+        #     class_="a",
+        #     grid_column_start=2,
+        #     grid_column_end=3,
+        #     grid_row_start=1,
+        #     grid_row_end=2,
+        # ).text("The cell to the left is a dataframe")
+
+        grid.cell("a", 1, 2, 1, 2).markdown("**Masculino**")
+        grid.cell("b", 2, 3, 1, 2).markdown("**Feminino**")
+
+        grid.cell("c", 1, 2, 2, 3).dataframe(division_sum_m)
+        grid.cell("d", 2, 3, 2, 3).dataframe(division_sum_f)
+
+        # grid.cell("c", 3, 4, 2, 3).plotly_chart(get_plotly_fig())
+        # grid.cell("d", 1, 2, 1, 3).dataframe(get_dataframe())
+        # grid.cell("e", 3, 4, 1, 2).markdown(
+        #     "Try changing the **block container style** in the sidebar!"
+        # )
+        # grid.cell("f", 1, 3, 3, 4).text(
+        #     "The cell to the right is a matplotlib svg image"
+        # )
+        # grid.cell("g", 3, 4, 3, 4).pyplot(get_matplotlib_plt())

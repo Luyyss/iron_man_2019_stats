@@ -1,9 +1,11 @@
 import base64
 import importlib
+import utils.functions as funcs
 
 import streamlit as st
 
 def render_page(menupage):
+    funcs._set_style()
     menupage.write()
 
 def title_awesome(body: str):

@@ -10,6 +10,31 @@ def get_data():
     data.drop(columns=['BIB'], axis=1, inplace=True)
     return data
 
+
+def _set_style():
+    
+    padding_top = 0
+    padding_right = 1
+    padding_left = 1
+    padding_bottom = 10
+    max_width_str = f"max-width: 100%;"
+
+    st.markdown(
+        f"""
+            <style>
+                .reportview-container .main .block-container{{
+                    {max_width_str}
+                    padding-top: {padding_top}rem;
+                    padding-right: {padding_right}rem;
+                    padding-left: {padding_left}rem;
+                    padding-bottom: {padding_bottom}rem;
+                }}
+            </style>
+            """,
+        unsafe_allow_html=True,
+    )
+
+
 def getCategories(df):
     r = df['Division'].str[1:].unique()
     return r
@@ -67,4 +92,4 @@ def createStackPlot(df):
         )
     ).configure_view(
         strokeOpacity=0
-    ).properties(height=400, width=800)
+    ).properties(height=400, width=900)
