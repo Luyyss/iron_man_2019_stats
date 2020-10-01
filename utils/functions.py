@@ -1,6 +1,7 @@
 import pycountry
 import numpy as np
 import pandas as pd
+import altair as alt
 import streamlit as st
 
 # @st.cache
@@ -31,3 +32,39 @@ def getCountryName(val):
             return pycountry.countries.get(alpha_3=val).name
     else:
         return 'Invalid Code'
+
+def getDataAndConvert(data):
+
+    data['SwimN'] = data['Swim'].apply(strToSeconds)
+    data['BikeN'] = data['Bike'].apply(strToSeconds)
+    data['RunN'] = data['Run'].apply(strToSeconds)
+    data['T1N'] = data['T1'].apply(strToSeconds)
+    data['T2N'] = data['T2'].apply(strToSeconds)
+
+    df1 = prep_df(data, 'Swim', 1)
+    df2 = prep_df(data, 'T1', 2)
+    df3 = prep_df(data, 'Bike', 3)
+    df4 = prep_df(data, 'T2', 4)
+    df5 = prep_df(data, 'Run', 5)
+
+    return pd.concat([df1, df2, df3, df4, df5])
+
+def prep_df(data, name, ord):
+    df = pd.DataFrame( {'Name':data['Name'].tolist(), 'Tempo':data[name].tolist(), 'Total':data['Overall'].tolist(), 'Segundos':data[name+'N'].tolist(), 'c2':'N'}, columns=['Name', 'Tempo', 'Segundos'] )
+    df['Classe'] = name
+    df['Order'] = ord
+    return df
+
+def createStackPlot(df):
+    return alt.Chart( df ).mark_bar().encode(
+        x=alt.X('Segundos:Q', axis=alt.Axis( title=None)),
+        y=alt.Y('Name:N', axis=alt.Axis(grid=False, title=None), sort=alt.EncodingSortField(field="Segundos", op="sum", order='ascending')),
+        color=alt.Color('Classe:N', sort=['SwimN', 'T1N', 'BikeN', 'T2N', 'RunN'], scale=alt.Scale(range=['#96ceb4', '#BF820E','#4BA55E', '#4FA7A5', '#CBBE00'])),
+        tooltip=['Tempo:N'],
+        order=alt.Order(
+            'Order',
+            sort='ascending'
+        )
+    ).configure_view(
+        strokeOpacity=0
+    ).properties(height=400, width=800)

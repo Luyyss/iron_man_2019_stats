@@ -6,12 +6,14 @@ import resources.translate as translate
 import src.pages.home
 import src.pages.about
 import src.pages.coutryes
+import src.pages.dnsdnf
 
 MENU = {
     "Top 10" : src.pages.home,
     "Estatísticas dos países" : src.pages.coutryes,
     "Estatísticas por modalidade" : src.pages.coutryes,
     "Estatísticas por atleta" : src.pages.coutryes,
+    "Estatísticas DNS e DNF" : src.pages.dnsdnf,
     "Sobre" : src.pages.about
 }
 
@@ -21,10 +23,6 @@ LINGUAGENS = [
 ]
 
 linguagem_corrente = 0
-
-
-def getLinguagemCorrente():
-    return linguagem_corrente
 
 def getLangText(ref):
     return translate.texts[linguagem_corrente][ref]
