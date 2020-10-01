@@ -4,3 +4,4 @@ __pycache__/*
 env/*
 utils/__pycache__/*
 src/pages/__pycache__/*
+src/classes/__pycache__/*
