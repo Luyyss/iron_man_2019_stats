@@ -58,13 +58,18 @@ def getCountryName(val):
     else:
         return 'Invalid Code'
 
-def getDataAndConvert(data):
-
+def convertTimes(data):
     data['SwimN'] = data['Swim'].apply(strToSeconds)
     data['BikeN'] = data['Bike'].apply(strToSeconds)
     data['RunN'] = data['Run'].apply(strToSeconds)
     data['T1N'] = data['T1'].apply(strToSeconds)
     data['T2N'] = data['T2'].apply(strToSeconds)
+
+    return data
+
+def getDataAndConvert(data):
+
+    data = convertTimes(data)
 
     df1 = prep_df(data, 'Swim', 1)
     df2 = prep_df(data, 'T1', 2)
@@ -92,4 +97,29 @@ def createStackPlot(df):
         )
     ).configure_view(
         strokeOpacity=0
-    ).properties(height=400, width=900)
+    ).properties( 
+        height=400, width=900 
+    )
+
+    # text = alt.Chart(df).mark_text(dx=-15, dy=3, color='white').encode(
+    #     x=alt.X('Tempo:N', stack='zero'),
+    #     y=alt.Y('Name:N'),
+    #     detail='Classe:N',
+    #     text=alt.Text('Tempo:N') #, format='.1f'
+    # )
+
+    # return alt.layer(bars , text).configure_view(
+    #     stroke='transparent'
+    # ).configure_scale(
+    #     rangeStep=100
+    # ).configure_axis(
+    #     labelFontSize=16,
+    #     titleFontSize=16,
+    #     domainWidth=0.0
+    # )
+    # 
+
+    # return (bars + text).properties( height=400, width=900 )
+
+def getValueUniq(df, field):
+    return df[field].tolist()[0]
