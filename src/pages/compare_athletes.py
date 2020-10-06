@@ -11,9 +11,8 @@ def write():
     data = funcs.get_data()
     data = funcs.convertTimes(data)
     data['Country Name'] = data['Country'].apply(funcs.getCountryName)
-    data = data.loc[data['Overall'] != 'DNS'] 
-    data = data.loc[data['Overall'] != 'DNF'] 
-    data = data.loc[data['Overall'] != 'DQ'] 
+
+    data = funcs.removeNotFinished(data)
 
     ##
     ##  Gráfico
@@ -104,3 +103,6 @@ def write():
     with Grid("1 1", color="#000000", background_color="#FFFFFF") as grid:
         grid.cell("a", 1, 2, 1, 2).dataframe( df1.set_index('Atividade', inplace=False) )
         grid.cell("b", 2, 3, 1, 2).dataframe( df2.set_index('Atividade', inplace=False) )
+
+
+    # st.write(funcs.secondsToTime( funcs.getValueUniq(atleta2, 'RunN') ))

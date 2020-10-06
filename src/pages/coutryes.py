@@ -49,6 +49,20 @@ def write():
     st.altair_chart(bars)
 
 
+    # countries = alt.topo_feature('https://vega.github.io/vega-datasets/data/world-110m.json', 'countries')
+
+    # b = alt.Chart(countries).mark_geoshape(
+    #     fill='lightgray',
+    #     stroke='white'
+    # ).project(
+    #     "equirectangular"
+    # ).properties(
+    #     width=900,
+    #     height=500
+    # )
+
+    # st.altair_chart(b)
+
     ##
     ## 
     ##

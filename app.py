@@ -8,13 +8,14 @@ import src.pages.about
 import src.pages.coutryes
 import src.pages.dnsdnf
 import src.pages.athlete
+import src.pages.modality
 import src.pages.compare_athletes
 
 
 MENU = {
     "Top 10" : src.pages.home,
     "Estatísticas dos países" : src.pages.coutryes,
-    "Estatísticas por modalidade" : src.pages.coutryes,
+    "Estatísticas por modalidade" : src.pages.modality,
     "Estatísticas por atleta" : src.pages.athlete,
     "Comparar atletas" : src.pages.compare_athletes,
     "Estatísticas DNS, DNF e DQ" : src.pages.dnsdnf,

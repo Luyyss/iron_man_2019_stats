@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import altair as alt
 import streamlit as st
+import datetime
 
 # @st.cache
 def get_data():
@@ -46,6 +47,10 @@ def strToSeconds(val):
     else:
         return str(val)
 
+def secondsToTime(s):
+    return str(datetime.timedelta(seconds=s))
+
+
 list_alpha_2 = [i.alpha_2 for i in list(pycountry.countries)]
 list_alpha_3 = [i.alpha_3 for i in list(pycountry.countries)]    
 
@@ -59,11 +64,12 @@ def getCountryName(val):
         return 'Invalid Code'
 
 def convertTimes(data):
-    data['SwimN'] = data['Swim'].apply(strToSeconds)
-    data['BikeN'] = data['Bike'].apply(strToSeconds)
-    data['RunN'] = data['Run'].apply(strToSeconds)
-    data['T1N'] = data['T1'].apply(strToSeconds)
-    data['T2N'] = data['T2'].apply(strToSeconds)
+
+    data = data.assign(SwimN=( data.apply(lambda row: strToSeconds(row.Swim), axis=1) ).values )
+    data = data.assign(BikeN=( data.apply(lambda row: strToSeconds(row.Bike), axis=1) ).values )
+    data = data.assign(RunN=( data.apply(lambda row: strToSeconds(row.Run), axis=1) ).values )
+    data = data.assign(T1N=( data.apply(lambda row: strToSeconds(row.T1), axis=1) ).values )
+    data = data.assign(T2N=( data.apply(lambda row: strToSeconds(row.T2), axis=1) ).values )
 
     return data
 
@@ -101,25 +107,21 @@ def createStackPlot(df):
         height=400, width=900 
     )
 
-    # text = alt.Chart(df).mark_text(dx=-15, dy=3, color='white').encode(
-    #     x=alt.X('Tempo:N', stack='zero'),
-    #     y=alt.Y('Name:N'),
-    #     detail='Classe:N',
-    #     text=alt.Text('Tempo:N') #, format='.1f'
-    # )
-
-    # return alt.layer(bars , text).configure_view(
-    #     stroke='transparent'
-    # ).configure_scale(
-    #     rangeStep=100
-    # ).configure_axis(
-    #     labelFontSize=16,
-    #     titleFontSize=16,
-    #     domainWidth=0.0
-    # )
-    # 
-
-    # return (bars + text).properties( height=400, width=900 )
 
 def getValueUniq(df, field):
     return df[field].tolist()[0]
+
+
+def removeNotFinished(data):
+
+    data = data.drop(data[data['Overall Rank'] == 'DNF'].index)
+    data = data.drop(data[data['Overall Rank'] == 'DNS'].index)
+    data = data.drop(data[data['Overall Rank'] == 'DQ'].index)
+
+    return data
+
+def fillNa(df):
+    for i in df.columns:
+        if(type(df[i]) == int):
+            df.fillna(df[i].mean(),inplace=True)
+    return df
