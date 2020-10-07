@@ -13,18 +13,11 @@ def write():
     data = funcs.get_data()
     data['Country Name'] = data['Country'].apply(funcs.getCountryName)
 
-    # sentence = st.text_input('Input your sentence here:') 
-
-    # if sentence:
-    #     st.write(sentence)
-
     athletes = data['Name'].unique()
 
-    option = st.selectbox('Buscar atleta pelo nome:', sorted(athletes) )
+    option = st.sidebar.selectbox('Buscar atleta pelo nome:', sorted(athletes) )
 
     atleta = data.loc[data['Name'] == option]
-
-    # udisp.title_awesome("Resumo:")
 
     atleta = atleta.drop(['Country'], axis=1)
 
@@ -53,5 +46,3 @@ def write():
             )
             .properties(height=450, width=700)
         )
-
-    # udisp.title_awesome("Detalhamento:")

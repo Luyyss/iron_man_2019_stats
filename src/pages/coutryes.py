@@ -28,11 +28,11 @@ def write():
         'Atletas': countryes_sum_values
     })
 
-    udisp.title_awesome("Quantidade de atletas por país")
+    udisp.title_awesome("Quantidade de Atletas por país")
 
     bars = alt.Chart(df).mark_bar().encode(
-        alt.Y('Atletas', type='quantitative', title='Quantidade de atletas'),
-        alt.X('name', type='nominal', title='País'),
+        alt.Y('Atletas', type='quantitative', title='Quantidade de Atletas'),
+        alt.X('name:N', title='País'),
         tooltip=['Atletas']
     ).properties(height=450) #, width=700
 
@@ -67,47 +67,118 @@ def write():
     ## 
     ##
 
-    udisp.title_awesome("Top atletas por país")
 
     categorias = funcs.getCategories(data)
 
     option = st.sidebar.selectbox( "Selecione a categoria", sorted(categorias) )
 
-    atletas_m = data.loc[data['Division'] == f'M{option}']
-    atletas_f = data.loc[data['Division'] == f'F{option}']
+    Atletas_m = data.loc[data['Division'] == f'M{option}']
+    Atletas_f = data.loc[data['Division'] == f'F{option}']
 
-    # st.dataframe(atletas_m.head(10))
+    Atletas_m['Gender'] = 'Masculino'
+    Atletas_f['Gender'] = 'Feminino'
 
-    q = st.sidebar.selectbox( "Quantidade de atletas", [5,10, 15,20] )
+    # st.dataframe(Atletas_m.head(10))
 
-    division_sum_m = atletas_m.head( int(q) ).groupby(['Country', 'Country Name']).agg({"Atletas": np.sum})
+    q = st.sidebar.selectbox( "Quantidade de Atletas", [5,10, 15,20] )
+
+    udisp.title_awesome(f'Top {q} atletas por país na categoria')
+
+    division_sum_m = Atletas_m.head( int(q) ).groupby(['Country', 'Country Name', 'Gender']).agg({"Atletas": np.sum})
     # st.dataframe(division_sum_m)
 
-    division_sum_f = atletas_f.head( int(q) ).groupby(['Country', 'Country Name']).agg({"Atletas": np.sum})
+    division_sum_f = Atletas_f.head( int(q) ).groupby(['Country', 'Country Name', 'Gender']).agg({"Atletas": np.sum})
     # st.dataframe(division_sum_f)
-    
 
-    with Grid("1 1 1", color="#000000", background_color="#FFFFFF") as grid:
-        # grid.cell(
-        #     class_="a",
-        #     grid_column_start=2,
-        #     grid_column_end=3,
-        #     grid_row_start=1,
-        #     grid_row_end=2,
-        # ).text("The cell to the left is a dataframe")
+    topAtletas = pd.concat( [division_sum_f , division_sum_m] )
+    # st.dataframe(topAtletas)
 
-        grid.cell("a", 1, 2, 1, 2).markdown("**Masculino**")
-        grid.cell("b", 2, 3, 1, 2).markdown("**Feminino**")
+    source = pd.DataFrame({
+        'abrev': topAtletas.index.get_level_values(0),
+        'name': topAtletas.index.get_level_values(1),
+        'Sexo': topAtletas.index.get_level_values(2),
+        'Atletas': np.array(topAtletas['Atletas'].tolist())
+    })
 
-        grid.cell("c", 1, 2, 2, 3).dataframe(division_sum_m)
-        grid.cell("d", 2, 3, 2, 3).dataframe(division_sum_f)
+    # st.dataframe(source)
 
-        # grid.cell("c", 3, 4, 2, 3).plotly_chart(get_plotly_fig())
-        # grid.cell("d", 1, 2, 1, 3).dataframe(get_dataframe())
-        # grid.cell("e", 3, 4, 1, 2).markdown(
-        #     "Try changing the **block container style** in the sidebar!"
-        # )
-        # grid.cell("f", 1, 3, 3, 4).text(
-        #     "The cell to the right is a matplotlib svg image"
-        # )
-        # grid.cell("g", 3, 4, 3, 4).pyplot(get_matplotlib_plt())
+    c = alt.Chart(source).mark_bar().encode(
+        x=alt.X('Sexo:N', axis=alt.Axis(title=None)),
+        y=alt.Y('Atletas:Q', axis=alt.Axis(offset=1) ), #, scale=alt.Scale(round=True)
+        color='Sexo:N',
+        column=alt.Column('name:N', title='País', header=alt.Header(labelAngle=270, labelAlign='right')) 
+    )
+
+    st.altair_chart(c)
+
+    # with Grid("1 1 1", color="#000000", background_color="#FFFFFF") as grid:
+
+    #     grid.cell("a", 1, 2, 1, 2).markdown("**Masculino**")
+    #     grid.cell("b", 2, 3, 1, 2).markdown("**Feminino**")
+
+    #     grid.cell("c", 1, 2, 2, 3).dataframe(division_sum_m)
+    #     grid.cell("d", 2, 3, 2, 3).dataframe(division_sum_f)
+
+    ##
+    ##  Países com mais Atletas entre os top 5
+    ##
+
+    udisp.title_awesome(f'Top {q} atletas por país em todas categorias')
+
+    data = funcs.removeNotFinished(data)
+
+    data = data.astype({"Division Rank": int})
+
+    data = data[data['Division Rank'] <= q ] 
+
+    countryes_sum = data.groupby(['Country', 'Country Name', 'Division']).agg({"Atletas": np.sum})
+
+    # st.table( countryes_sum )
+
+    source = pd.DataFrame({
+        'abrev': countryes_sum.index.get_level_values(0),
+        'name': countryes_sum.index.get_level_values(1),
+        'Categoria': countryes_sum.index.get_level_values(2),
+        'Atletas': np.array(countryes_sum['Atletas'].tolist())
+    })
+
+    # st.table(source)
+
+    color_scale = alt.Scale(
+        domain=np.array(countryes_sum.index.get_level_values(2)),
+        range=["#c30d24", "#f3a583", "#cccccc", "#94c6da", "#1770ab"]
+    )
+
+    y_axis = alt.Axis(
+        title=None, #'País',
+        offset=1,
+        ticks=False,
+        minExtent=60,
+        domain=False
+    )
+
+    c = alt.Chart( source ).mark_bar().encode(
+        x='Atletas:Q',
+        y=alt.Y('name:N', axis=y_axis),
+        tooltip=['Atletas', 'Categoria'],
+        color=alt.Color(
+            'Categoria:N',
+            legend=alt.Legend( title='Categoria'),
+            scale=color_scale,
+        )
+    )
+
+    st.altair_chart( (c).properties(width=900) )
+
+
+
+
+    # exam_data  = {'name': ['Anastasia', 'Dima', 'Katherine', 'James', 'Emily', 'Michael', 'Matthew', 'Laura', 'Kevin', 'Jonas'],
+    #     'score': [12.5, 9, 16.5, np.nan, 9, 20, 14.5, np.nan, 8, 19],
+    #     'attempts': [1, 3, 2, 3, 2, 3, 1, 1, 2, 1],
+    #     'qualify': ['yes', 'no', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes']}
+
+    # labels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
+    # df = pd.DataFrame(exam_data , index=labels)
+    # st.write("Number of attempts in the examination is less than 2 and score greater than 15 :")
+    # st.table(df[(df['attempts'] < 2) & (df['score'] > 15)])
