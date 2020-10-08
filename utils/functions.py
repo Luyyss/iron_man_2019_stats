@@ -86,16 +86,16 @@ def getDataAndConvert(data):
     return pd.concat([df1, df2, df3, df4, df5])
 
 def prep_df(data, name, ord):
-    df = pd.DataFrame( {'Name':data['Name'].tolist(), 'Tempo':data[name].tolist(), 'Total':data['Overall'].tolist(), 'Segundos':data[name+'N'].tolist(), 'c2':'N'}, columns=['Name', 'Tempo', 'Segundos'] )
+    df = pd.DataFrame( {'Name':data['Name'].tolist(), 'Tempo':data[name].tolist(), 'Segundos':data[name+'N'].tolist(), 'c2':'N'}, columns=['Name', 'Tempo', 'Segundos'] ) #'Total':data['Overall'].tolist(), 
     df['Classe'] = name
     df['Order'] = ord
     return df
 
 def createStackPlot(df):
     return alt.Chart( df ).mark_bar().encode(
-        x=alt.X('Segundos:Q', axis=alt.Axis( title=None)),
+        x=alt.X('Segundos:Q', axis=alt.Axis( title=None)), #hoursminutes(
         y=alt.Y('Name:N', axis=alt.Axis(grid=False, title=None), sort=alt.EncodingSortField(field="Segundos", op="sum", order='ascending')),
-        color=alt.Color('Classe:N', sort=['SwimN', 'T1N', 'BikeN', 'T2N', 'RunN'], scale=alt.Scale(range=['#96ceb4', '#BF820E','#4BA55E', '#4FA7A5', '#CBBE00'])),
+        color=alt.Color('Classe:N', sort=['SwimN', 'T1N', 'BikeN', 'T2N', 'RunN'], scale=alt.Scale(scheme='tableau20') ), #scale=alt.Scale(range=['#96ceb4', '#BF820E','#4BA55E', '#4FA7A5', '#CBBE00'])
         tooltip=['Tempo:N'],
         order=alt.Order(
             'Order',

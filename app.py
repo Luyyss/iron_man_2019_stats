@@ -10,6 +10,8 @@ import src.pages.dnsdnf
 import src.pages.athlete
 import src.pages.modality
 import src.pages.compare_athletes
+import src.pages.distribute
+import src.pages.medians
 
 
 MENU = {
@@ -19,6 +21,8 @@ MENU = {
     "Estatísticas por atleta" : src.pages.athlete,
     "Comparar atletas" : src.pages.compare_athletes,
     "Estatísticas DNS, DNF e DQ" : src.pages.dnsdnf,
+    "Distribuições" : src.pages.distribute,
+    "Médias por categoria" : src.pages.medians,
     "Sobre" : src.pages.about
 }
 
