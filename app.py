@@ -12,12 +12,14 @@ import src.pages.modality
 import src.pages.compare_athletes
 import src.pages.distribute
 import src.pages.medians
+import src.pages.category
 
 
 MENU = {
     "Top 10" : src.pages.home,
     "Estatísticas dos países" : src.pages.coutryes,
     "Estatísticas por modalidade" : src.pages.modality,
+    "Estatísticas por categoria" : src.pages.category,
     "Estatísticas por atleta" : src.pages.athlete,
     "Comparar atletas" : src.pages.compare_athletes,
     "Estatísticas DNS, DNF e DQ" : src.pages.dnsdnf,

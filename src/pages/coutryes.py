@@ -4,7 +4,6 @@ import altair as alt
 import streamlit as st
 import utils.display as udisp
 import utils.functions as funcs
-from src.classes.Grid import Grid
 
 def write():
 
@@ -23,8 +22,8 @@ def write():
     countryes_names = countryes_sum.index.get_level_values(1)
 
     df = pd.DataFrame({
-        'abrev': countryes_abrev,
-        'name': countryes_names,
+        'Country': countryes_abrev,
+        'Country Name': countryes_names,
         'Atletas': countryes_sum_values
     })
 
@@ -32,7 +31,7 @@ def write():
 
     bars = alt.Chart(df).mark_bar().encode(
         alt.Y('Atletas', type='quantitative', title='Quantidade de Atletas'),
-        alt.X('name:N', title='País'),
+        alt.X('Country Name:N', title='País'),
         tooltip=['Atletas']
     ).properties(height=450) #, width=700
 
@@ -41,34 +40,50 @@ def write():
         baseline='middle',
         dx=2  # Nudges text to right so it doesn't appear on top of the bar
     ).encode(
-        text='abrev'
+        text='Country'
     )
 
     (bars + text).properties(widht=600)
 
     st.altair_chart(bars)
 
-
-    # countries = alt.topo_feature('https://vega.github.io/vega-datasets/data/world-110m.json', 'countries')
-
-    # b = alt.Chart(countries).mark_geoshape(
-    #     fill='lightgray',
-    #     stroke='white'
-    # ).project(
-    #     "equirectangular"
-    # ).properties(
-    #     width=900,
-    #     height=500
-    # )
-
-    # st.altair_chart(b)
-
     ##
-    ## 
+    ##  PAÍSES COM MAIS ATLETAS 
     ##
 
+    udisp.title_awesome('Top 10 países com mais atletas')
+
+    total = data.shape[0]
+
+    df['Porcentagem'] = 0
+
+    # df['Porcentagem'].apply(lambda x: calcPorcent(total, x['Atletas']), axis=1 ) 
+    df['Porcentagem'] = df.apply(lambda x: funcs.showPercent(funcs.calcPercent(total, x['Atletas']) ), axis=1)
+
+    df = df.sort_values('Atletas',ascending = False).reset_index().assign(hack='').set_index('hack').drop(['index'], axis=1).head(10)
+
+    st.table(df)
+
+    ##
+    ##  PAÍSES COM MAIS VENCEDORES NAS CATEGORIAS
+    ##
+
+    udisp.title_awesome('Top países com mais vitórias')
 
     categorias = funcs.getCategories(data)
+
+    totalCat = len(categorias)
+
+    df = data[ data['Division Rank'].eq('1') ].groupby(['Country', 'Country Name']).agg({"Atletas": np.sum})
+
+    df = df.rename({'Atletas':'Vitórias'}, axis='columns')
+
+    df = df.sort_values('Vitórias',ascending = False).reset_index().assign(hack='').set_index('hack').head(10)
+
+    df['Porcentagem'] = df.apply(lambda x: funcs.showPercent(funcs.calcPercent(totalCat, x['Vitórias']) ), axis=1)
+
+    st.table(df)
+
 
     option = st.sidebar.selectbox( "Selecione a categoria", sorted(categorias) )
 
@@ -78,20 +93,15 @@ def write():
     Atletas_m['Gender'] = 'Masculino'
     Atletas_f['Gender'] = 'Feminino'
 
-    # st.dataframe(Atletas_m.head(10))
-
     q = st.sidebar.selectbox( "Quantidade de Atletas", [5,10, 15,20] )
 
     udisp.title_awesome(f'Top {q} atletas por país na categoria')
 
     division_sum_m = Atletas_m.head( int(q) ).groupby(['Country', 'Country Name', 'Gender']).agg({"Atletas": np.sum})
-    # st.dataframe(division_sum_m)
 
     division_sum_f = Atletas_f.head( int(q) ).groupby(['Country', 'Country Name', 'Gender']).agg({"Atletas": np.sum})
-    # st.dataframe(division_sum_f)
 
     topAtletas = pd.concat( [division_sum_f , division_sum_m] )
-    # st.dataframe(topAtletas)
 
     source = pd.DataFrame({
         'abrev': topAtletas.index.get_level_values(0),
@@ -99,8 +109,6 @@ def write():
         'Sexo': topAtletas.index.get_level_values(2),
         'Atletas': np.array(topAtletas['Atletas'].tolist())
     })
-
-    # st.dataframe(source)
 
     c = alt.Chart(source).mark_bar().encode(
         x=alt.X('Sexo:N', axis=alt.Axis(title=None)),
@@ -142,8 +150,6 @@ def write():
         'Atletas': np.array(countryes_sum['Atletas'].tolist())
     })
 
-    # st.table(source)
-
     color_scale = alt.Scale(
         domain=np.array(countryes_sum.index.get_level_values(2)),
         range=["#c30d24", "#f3a583", "#cccccc", "#94c6da", "#1770ab"]
@@ -169,16 +175,3 @@ def write():
     )
 
     st.altair_chart( (c).properties(width=900) )
-
-
-
-
-    # exam_data  = {'name': ['Anastasia', 'Dima', 'Katherine', 'James', 'Emily', 'Michael', 'Matthew', 'Laura', 'Kevin', 'Jonas'],
-    #     'score': [12.5, 9, 16.5, np.nan, 9, 20, 14.5, np.nan, 8, 19],
-    #     'attempts': [1, 3, 2, 3, 2, 3, 1, 1, 2, 1],
-    #     'qualify': ['yes', 'no', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes']}
-
-    # labels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
-    # df = pd.DataFrame(exam_data , index=labels)
-    # st.write("Number of attempts in the examination is less than 2 and score greater than 15 :")
-    # st.table(df[(df['attempts'] < 2) & (df['score'] > 15)])

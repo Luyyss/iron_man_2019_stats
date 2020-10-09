@@ -125,3 +125,11 @@ def fillNa(df):
         if(type(df[i]) == int):
             df.fillna(df[i].mean(),inplace=True)
     return df
+
+
+
+def calcPercent(t, n):
+    return 100 * (n / t)
+
+def showPercent(f):
+    return f'{"{:.2f}".format(f)}%'

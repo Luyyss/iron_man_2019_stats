@@ -35,14 +35,14 @@ def calculeMedianFromCat(cat, n):
 
 def write():
 
-    # calculeMedianFromCat('MPRO', 10)
+    q = st.sidebar.selectbox( "Quantidade de Atletas", [10, 20, 30, 50] )
 
     cats = data['Division'].unique()
     
     arr = []
 
     for c in cats:
-        arr.append( calculeMedianFromCat(c, 10) )
+        arr.append( calculeMedianFromCat(c, q) )
 
     df = pd.DataFrame(arr)
 
@@ -69,6 +69,6 @@ def write():
         ).configure_view(
             strokeOpacity=0
         ).properties( 
-            height=400, width=800 
+            height=500, width=850 
         )
     )
